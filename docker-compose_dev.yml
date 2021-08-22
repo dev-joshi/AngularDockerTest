@@ -1,0 +1,29 @@
+version: '3.7'
+services:
+  docker-frontend-one:
+    image: docker-frontend-one
+    volumes:
+      - ./frontend-one:/app
+      - /app/node_modules
+    ports:
+      - "4200:4200"
+    command: "ng serve --port 4200 --host 0.0.0.0 --public-host=\"http://0.0.0.0:4200\" --disable-host-check"
+  docker-frontend-two:
+    image: docker-frontend-two
+    volumes:
+      - ./frontend-two:/app
+      - /app/node_modules
+    ports:
+      - "4201:4201"
+    command: "ng serve --port 4201 --host 0.0.0.0 --public-host=\"http://0.0.0.0:4201\" --base-href /two/ --disable-host-check"
+  docker-nginx:
+    image: docker-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/etc/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/etc/conf.d/nginx.dev.conf:/etc/nginx/conf.d/default.conf
+    command: ["nginx", "-g", "daemon off;"]
+    links:
+      - docker-frontend-one
+      - docker-frontend-two
